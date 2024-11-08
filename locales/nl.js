@@ -1,7 +1,6 @@
-define(["./prototype"], function(proto) { return {
+define(["./prototype"], function(proto) { alert(1); return {
 	
-	proto: proto,
-	
+	// proto: proto,
 	"OpenLayers": {
 		"-layers":					"Lagen",
 		"-features":				{

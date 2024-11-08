@@ -1,8 +1,6 @@
 define(["./prototype"], (proto) => ({
 	
-	proto: proto,
-	
-	
+	// proto: proto,
 	"OpenLayers": {
 		"-layers":					"Layers",
 		"-features": {
@@ -14,6 +12,5 @@ define(["./prototype"], (proto) => ({
 		},
 		"-documents":				"Documents"
 	}
-	
-	
+
 }));
