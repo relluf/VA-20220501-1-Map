@@ -1,6 +1,6 @@
-"use v7/openlayers/proj/RD";
+"use veldapps-ol/proj/RD";
 
-var RD = require("v7/openlayers/proj/RD");
+var RD = require("veldapps-ol/proj/RD");
 
 var numberfy = (o) => {
 	return Object.keys(o).reduce((t, k) => {
@@ -25,7 +25,8 @@ var getArray = (c) => {
 				// .filter(e => e[0].endsWith("meetpunten.tsv") || 
 					e[0].endsWith("meetpunten.tsv"))
 				.map(e => e[1])[0]
-				.qs("#array");
+				.qsa("#array")
+				.pop();
 	}
 	return r && r.getArray();
 };

@@ -1,5 +1,5 @@
 var meetpunten = ws.qsa("devtools/Editor<>:root")
-	.filter(e => e.vars(["resource.uri"]).split("/").pop() === "meetpunten-50000.tsv")
+	.filter(e => e.vars(["resource.uri"]).split("/").pop() === "meetpunten.tsv")
 	.map(c => c.qs("#array").getArray())
 	.pop();
 
@@ -7,7 +7,7 @@ var map = ws.qs("veldapps/Map<>").vars("map"), me = this;
 
 var now = Date.now();
 var proj = "EPSG:28992";
-var RD = require("veldapps-ol/proj/RD");
+var RD = require("v7/openlayers/proj/RD");
 var N = meetpunten.length;//77061 //40000;
 var numberfy = (o) => {
 	return Object.keys(o).reduce((t, k) => {
