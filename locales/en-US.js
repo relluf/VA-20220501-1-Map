@@ -1,0 +1,1 @@
+define(["./en"], en => en);
