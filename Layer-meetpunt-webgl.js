@@ -1,5 +1,5 @@
 var meetpunten = ws.qsa("devtools/Editor<>:root")
-	.filter(e => e.vars(["resource.uri"]).split("/").pop() === "meetpunten.tsv")
+	.filter(e => ["meetpunten.tsv", "meetpunten-50000.tsv"].includes(e.vars(["resource.uri"]).split("/").pop()))
 	.map(c => c.qs("#array").getArray())
 	.pop();
 
@@ -7,8 +7,8 @@ var map = ws.qs("veldapps/Map<>").vars("map"), me = this;
 
 var now = Date.now();
 var proj = "EPSG:28992";
-var RD = require("v7/openlayers/proj/RD");
-var N = meetpunten.length;//77061 //40000;
+var RD = require("veldapps-ol/proj/RD");
+var N = meetpunten.length;
 var numberfy = (o) => {
 	return Object.keys(o).reduce((t, k) => {
 		var n = o[k];
@@ -81,7 +81,7 @@ var layer = new ol.layer.WebGLPoints({
 		// ]
 		symbol: {
 				symbolType: 'circle',
-				size: 10,
+				size: 20,
 				color: ['color',
 						// 56, 121, 217,
 						['+', ['%', ['get', 'bedrijf'], 156], 64],
@@ -90,7 +90,7 @@ var layer = new ol.layer.WebGLPoints({
 						1.2
 						// ['+', ['/', ['%', ['get', 'onderzoek'], 75], 100], 0.25]
 				],
-				// opacity: 0.9//['-', 1.0, ['*', animRatio, 0.75]],
+				// opacity: 0.9,//['-', 1.0, ['*', animRatio, 0.75]],
 			}
 	}
 

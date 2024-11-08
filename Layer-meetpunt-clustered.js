@@ -1,9 +1,12 @@
-var meetpunten = ws.qs("#Projects/Map/meetpunten\\.tsv #array").getArray();
+var meetpunten = ws.qsa("devtools/Editor<>:root")
+	.filter(e => ["meetpunten.tsv", "meetpunten-50000.tsv"].includes(e.vars(["resource.uri"]).split("/").pop()))
+	.map(c => c.qs("#array").getArray())
+	.pop();
 var map = ws.qs("veldapps/Map<>").vars("map"), me = this;
 
 var now = Date.now();
 var proj = "EPSG:28992";
-var RD = require("v7/openlayers/proj/RD");
+var RD = require("veldapps-ol/proj/RD");
 var N = 77061;
 var features = meetpunten.slice(meetpunten.length - N, meetpunten.length)
 	.map(mpt => [parseInt(mpt.xcoord, 10), parseInt(mpt.ycoord, 10), mpt])
