@@ -9,6 +9,22 @@ var numberfy = (o) => {
 		return t;
 	}, {});
 };
+const stringToColor = (str) => {
+    // Simple hash function to create a number from the string
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    // Convert the hash to a hex color code
+    const color = [];
+    for (let i = 0; i < 3; i++) {
+        const value = (hash >> (i * 8)) & 0xFF;
+        color.push(value);
+    }
+    
+    return color;
+};
 
 var getArray = (c) => { 
 	// need an API (!!!) CVLN-20210109-1 - Maker / CVLN-20220509-1-code-API
@@ -21,7 +37,7 @@ var getArray = (c) => {
 	if(!r) {
 		r = root.qsa("devtools/Editor<tsv>:root")
 				.map(e => [e.vars(["resource.uri"]), e])
-				.filter(e => e[0].endsWith("meetpunten-50000.tsv") || 
+				.filter(e => e[0].endsWith("Meetpunt-[50k].tsv") || 
 				// .filter(e => e[0].endsWith("meetpunten.tsv") || 
 					e[0].endsWith("meetpunten.tsv"))
 				.map(e => e[1])[0]
