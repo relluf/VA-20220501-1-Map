@@ -25,45 +25,122 @@ const stringToColor = (str) => {
     return color;
 };
 
+const map = this.udr("veldapps/Map<>:root").vars("map");
+
+// Define the initial style function based on zoom
+function createZoomBasedStyle1(zoom) {
+  return {
+    symbol: {
+      symbolType: 'circle',
+      size: zoom < 10 ? 4 : zoom < 15 ? 9 : 16, // Adjust size based on zoom
+      color: ['color', 255, 255, 255, 1]
+    }
+  };
+}
+function createZoomBasedStyle2(zoom) {
+  return {
+	symbol: {
+		symbolType: 'circle',
+		size: zoom < 10 ? 3 : zoom < 15 ? 7 : 12, // Adjust size based on zoom
+		color: ['color',
+		['+', ['%', ['get', 'bedrijf'], 156], 64],
+		['+', ['%', ['get', 'bedrijf'], 96], 80],
+		['+', ['%', ['get', 'bedrijf'], 64], 92],
+		1
+		]
+	}
+  };
+}
+
 // Iterate documents named Meetpunt-[...].csv
 ws.qsa("devtools/Editor<>:root")
 
 	.map(e => [name(uri(e)), e])
-	.filter(e => /Meetpunt-\[.*\].csv/.test(e[0]))
+	.filter(e => /Meetpunt-\[.*\].[c|t]sv/.test(e[0]))
 	.forEach(e => {
-
 		const now = Date.now();
+		
+		let layer = e[1].vars("ol:layer"), result;
+
+		if(layer) return ws.print("already added", layer);
+		
 		const source = new ol.source.Vector();
 		const meetpunten = e[1].qs("#array").getArray();
-		const features = meetpunten
+		const features = result = meetpunten
 			.map(mpt => [parseInt(mpt.xcoord, 10), parseInt(mpt.ycoord, 10), mpt])
 			.filter(xy => !isNaN(xy[0]) && !isNaN(xy[1]))
-			.map(xy => new ol.Feature(
-				numberfy(js.mi({ geometry: new ol.geom.Point(xy) }, xy[2]))));
+			.map(xy => new ol.Feature(numberfy(js.mi({ 
+				geometry: new ol.geom.Point(xy) }, xy[2]))));
 
 		source.addFeatures(features);
 
-		const layer = new ol.layer.WebGLPoints({
+		const color = stringToColor(e[0]);
+		const zoom = map.getView().getZoom();
+		const layer1 = new ol.layer.WebGLPoints({
 			source: source,
 			disableHitDetection: true,
 			style: {
 				symbol: {
 					symbolType: 'circle',
-					size: 7,
-					color: ['color'].concat(stringToColor(e[0]))
+					size: 12,
+					// color: ['color',
+					// 	['+', ['%', ['get', 'onderzoek'], 156], 64],
+					// 	['+', ['%', ['get', 'onderzoek'], 96], 80],
+					// 	['+', ['%', ['get', 'onderzoek'], 64], 92],
+					// 	1
+					// ]
+					color: ['color', 255, 255, 255, 0.6667]
 				}
 			}
 		});
-		this.udr("#ol-layer-needed").execute({
-			parent: ws.qs("veldapps/Map<> #root-features"),
-			layer: {
-				layer: layer,
-				// source: source,
-				name: e[0]
+		const layer2 = new ol.layer.WebGLPoints({
+			source: source,
+			disableHitDetection: true,
+			style: {
+				symbol: {
+					symbolType: 'circle',
+					size: 9,
+					// color: ['color'].concat(color.slice(0, 3).concat([
+					// 	['+', ['/', ['%', ['get', 'onderzoek'], 75], 100], 0.25]
+					// ]))
+					color: ['color',
+						['+', ['%', ['get', 'bedrijf'], 156], 64],
+						['+', ['%', ['get', 'bedrijf'], 96], 80],
+						['+', ['%', ['get', 'bedrijf'], 64], 92],
+						1
+					]
+					// color: ['color'].concat(stringToColor(e[0]))
+					// color: [
+					// 	'color',
+					// 	...color.slice(0, 3),  // Use the RGB values from the color array
+					// 	[
+					// 		'clamp',  // Ensure opacity stays within 0.1 to 1.0
+					// 		[
+					// 		'+',
+					// 		['*', ['round', ['/', ['get', 'onderzoek'], 10]], 0.1], // Round to nearest tenner
+					// 		0.1
+					// 		],
+					// 		0.1, 1.0  // Minimum and maximum opacity bounds
+					// 	]
+					// ]
+				}
+				
 			}
 		});
 
-		ws.print(js.sf("%s (%dms)", e[0], Date.now() - now), features);
+		layer = new ol.layer.Group({ layers: [layer1, layer2] });
+		// layer = layer1;
+
+		this.udr("#ol-layer-needed").execute({
+			parent: ws.qs("veldapps/Map<> #root-features"),
+			layer: {
+				layer: layer, // source: source,
+				name: e[0]
+			}
+		});
+		
+		e[1].vars("ol:layer", layer);
+		ws.print(js.sf("%s (%dms)", e[0], Date.now() - now), result || layer);
 	});
 
 
