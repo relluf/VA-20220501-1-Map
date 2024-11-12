@@ -46,7 +46,7 @@ function collectGeometries(feature) {
     return geometries;  // Return the flattened array of geometries
 }
 
-["veldapps/Map", {
+[("veldapps/Map"), {
 	handlers: {
 		'map:ready'(map) {
 			map.on("click", (evt) => {
@@ -142,10 +142,13 @@ function collectGeometries(feature) {
 	}
 }, [
 
-	[("#root-layers"), { classes: "", expanded: true }],
-	[("#root-features"), { visible: true, expanded: true }],
-	[("#root-features-selected"), { visible: false }],
+	[("#root-layers"), { classes: "root-invisible", expanded: true }],		// background
+	[("#root-features"), { classes: "root-invisible", expanded: true }],	// application
+	[("#root-features-selected"), { visible: false }],			// selection
 	
-	[("#tree")]
+	[("#tree")],
+	
+	
+	
 	
 ]];
