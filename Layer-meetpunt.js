@@ -91,7 +91,7 @@ const csvs = ws.qsa("devtools/Editor<>:root")
 						radius: radius / 1.2,// * 1.35,
 						fill: ["ol:style.Fill", { color: stringToColor(e[0], 0.75) }],
 						stroke: ["ol:style.Stroke", { 
-							color: "white",
+							color: "rgba(255,255,255,0.5)",
 							width: 2
 						}]
 					}]
