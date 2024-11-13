@@ -139,6 +139,18 @@ function collectGeometries(feature) {
 	},
 	vars: {
 		'do-not-select': true
+	},
+	
+	css: {
+		
+		// 'input': "flex: 1; padding: 5px; border-radius: 5px; border: none; background: rgba(255,255,255,0.2); padding-left: 24px; padding-right: 24px; transition: width 0.5s; width: 150px;",
+		// 'input:not(:focus)': "",
+		// 'input:focus': "width: 300px;",
+		
+		'input': "background-color: transparent;",
+		
+		'input:not([type=checkbox])': "font-weight: bold; width: 100%; flex: 1; padding: 5px; border-radius: 5px; border: none; background: rgba(255,255,255,0.2);",
+		// '.{CheckGroup}': "padding-right: 8px;"
 	}
 }, [
 
@@ -146,9 +158,10 @@ function collectGeometries(feature) {
 	[("#root-features"), { classes: "root-invisible", expanded: true }],	// application
 	[("#root-features-selected"), { visible: false }],			// selection
 	
-	[("#tree")],
+	[("#tree"), [
+
+		[("#dots"), { onLoad() { this.setIndex(this.getParent().getControls().length - 1); } } ]
 	
-	
-	
-	
+	]]
+
 ]];
