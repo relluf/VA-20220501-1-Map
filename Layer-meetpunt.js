@@ -10,22 +10,33 @@ const numberfy = (o) => Object.keys(o).reduce((t, k) => {
 	return t;
 }, {});
 
-const stringToColor = (str) => {
+const stringToColor = (str, opacity = 1) => {
     // Simple hash function to create a number from the string
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
         hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
     
-    // Convert the hash to a hex color code
-    let color = '#';
-    for (let i = 0; i < 3; i++) {
-        const value = (hash >> (i * 8)) & 0xFF;
-        color += ('00' + value.toString(16)).slice(-2);
+    if(opacity === 1) {
+	    // Convert the hash to a hex color code
+	    let color = '#';
+	    for (let i = 0; i < 3; i++) {
+	        const value = (hash >> (i * 8)) & 0xFF;
+	        color += ('00' + value.toString(16)).slice(-2);
+	    }
+	    
+	    return color;
     }
-    
-    return color;
+
+    // Extract RGB values from the hash
+    let r = (hash >> 16) & 0xFF;
+    let g = (hash >> 8) & 0xFF;
+    let b = hash & 0xFF;
+
+    // Return the color as an RGBA string, with the specified opacity
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
+
 
 const Styles = {
 	cache: {},
@@ -64,8 +75,9 @@ const csvs = ws.qsa("devtools/Editor<>:root")
 			layer: {
 				// layer: layer,
 				source: source,
-				name: e[0]
-			}
+				name: e[0],
+				color: stringToColor(e[0], 0.75)
+			},
 		});
 		
 		layer.setStyle((feature, resolution) => {
@@ -76,8 +88,8 @@ const csvs = ws.qsa("devtools/Editor<>:root")
 			return Styles.get(js.sf("%s", e[0]), () => ol.create(
 				["ol:style.Style", {
 					image: ["ol:style.Circle", {
-						radius: radius * 1.35,
-						fill: ["ol:style.Fill", { color: stringToColor(e[0]) }],
+						radius: radius / 1.2,// * 1.35,
+						fill: ["ol:style.Fill", { color: stringToColor(e[0], 0.75) }],
 						stroke: ["ol:style.Stroke", { 
 							color: "white",
 							width: 2

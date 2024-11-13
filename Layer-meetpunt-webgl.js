@@ -8,7 +8,7 @@ const numberfy = (o) => Object.keys(o).reduce((t, k) => {
 	t[k] = isNaN(n) ? n : parseInt(n, 10);
 	return t;
 }, {});
-const stringToColor = (str) => {
+const stringToColorGL = (str) => {
     // Simple hash function to create a number from the string
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
@@ -24,6 +24,35 @@ const stringToColor = (str) => {
     
     return color;
 };
+const stringToColor = (str, opacity = 1) => {
+    // Simple hash function to create a number from the string
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    if(opacity === 1) {
+	    // Convert the hash to a hex color code
+	    let color = '#';
+	    for (let i = 0; i < 3; i++) {
+	        const value = (hash >> (i * 8)) & 0xFF;
+	        color += ('00' + value.toString(16)).slice(-2);
+	    }
+	    
+	    return color;
+    }
+
+    // Extract RGB values from the hash
+    let r = (hash >> 16) & 0xFF;
+    let g = (hash >> 8) & 0xFF;
+    let b = hash & 0xFF;
+
+    // Return the color as an RGBA string, with the specified opacity
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+};
+
+
+
 
 const map = this.udr("veldapps/Map<>:root").vars("map");
 
@@ -66,15 +95,26 @@ ws.qsa("devtools/Editor<>:root")
 		
 		const source = new ol.source.Vector();
 		const meetpunten = e[1].qs("#array").getArray();
+		
+		// meetpunten.forEach(mpt => mpt['bedrijf-color'] = stringToColorGL(bedrijfNaam[mpt.bedrijf]));
+		
 		const features = result = meetpunten
 			.map(mpt => [parseInt(mpt.xcoord, 10), parseInt(mpt.ycoord, 10), mpt])
 			.filter(xy => !isNaN(xy[0]) && !isNaN(xy[1]))
 			.map(xy => new ol.Feature(numberfy(js.mi({ 
 				geometry: new ol.geom.Point(xy) }, xy[2]))));
-
+				
 		source.addFeatures(features);
 
-		const color = stringToColor(e[0]);
+		const color = features.length > 0 && features[0].get("bedrijf") === undefined ?
+			['color'].concat(stringToColorGL(e[0])) :
+			['color',
+				['+', ['%', ['get', 'bedrijf'], 156], 64],
+				['+', ['%', ['get', 'bedrijf'], 96], 80],
+				['+', ['%', ['get', 'bedrijf'], 64], 92],
+				1
+			];
+			
 		const zoom = map.getView().getZoom();
 		const layer1 = new ol.layer.WebGLPoints({
 			source: source,
@@ -83,12 +123,6 @@ ws.qsa("devtools/Editor<>:root")
 				symbol: {
 					symbolType: 'circle',
 					size: 12,
-					// color: ['color',
-					// 	['+', ['%', ['get', 'onderzoek'], 156], 64],
-					// 	['+', ['%', ['get', 'onderzoek'], 96], 80],
-					// 	['+', ['%', ['get', 'onderzoek'], 64], 92],
-					// 	1
-					// ]
 					color: ['color', 255, 255, 255, 0.6667]
 				}
 			}
@@ -100,16 +134,10 @@ ws.qsa("devtools/Editor<>:root")
 				symbol: {
 					symbolType: 'circle',
 					size: 9,
+					color: color
 					// color: ['color'].concat(color.slice(0, 3).concat([
 					// 	['+', ['/', ['%', ['get', 'onderzoek'], 75], 100], 0.25]
 					// ]))
-					color: ['color',
-						['+', ['%', ['get', 'bedrijf'], 156], 64],
-						['+', ['%', ['get', 'bedrijf'], 96], 80],
-						['+', ['%', ['get', 'bedrijf'], 64], 92],
-						1
-					]
-					// color: ['color'].concat(stringToColor(e[0]))
 					// color: [
 					// 	'color',
 					// 	...color.slice(0, 3),  // Use the RGB values from the color array
@@ -124,7 +152,6 @@ ws.qsa("devtools/Editor<>:root")
 					// 	]
 					// ]
 				}
-				
 			}
 		});
 
@@ -135,7 +162,9 @@ ws.qsa("devtools/Editor<>:root")
 			parent: ws.qs("veldapps/Map<> #root-features"),
 			layer: {
 				layer: layer, // source: source,
-				name: e[0]
+				name: e[0],
+				color: stringToColor(e[0]),
+				count: features.length
 			}
 		});
 		
