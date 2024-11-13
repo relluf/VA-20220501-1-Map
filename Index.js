@@ -53,5 +53,6 @@ const Index = (Entity, period, criteria) => {
 		}));
 };
 Index.weeks = (Entity, where) => Index(Entity, "week", where ? {where} : {});
-Index.weeks("Meetpunt", ["or", ["isnull", "xcoord"], ["isnull", "ycoord"]]);
+Index.months = (Entity, where) => Index(Entity, "month", where ? {where} : {});
+Index.months("Meetpunt", ["or", ["isnull", "xcoord"], ["isnull", "ycoord"]]);
 // Index.weeks("Onderzoek");

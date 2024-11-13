@@ -74,10 +74,5 @@ pr("page-" + currentPage, results);
 
 
 
-VO.em.query("Onderzoek")
 
-
-
-
-
-this.__NO_VALUE__;
+// this.__NO_VALUE__;
